@@ -40,9 +40,9 @@ class Screen extends StatelessWidget {
           ]
         )
       ),
-      body: const TabBarView(
+      body: TabBarView(
         children: [
-          PageOne(),
+          const PageOne(),
           PageTwo(),
         ]
       )
@@ -74,56 +74,66 @@ class PageOne extends StatelessWidget {
 }
 
 class PageTwo extends StatefulWidget {
-  const PageTwo({Key? key}) : super(key: key);
+  int index;
+  PageTwo({Key? key, this.index = 0}) : super(key: key);
 
   @override
   State<PageTwo> createState() => _PageTwoState();
 }
 
 class _PageTwoState extends State<PageTwo> {
+  final List<Widget> _pages = [
+    const Center(
+      child: Text('1'),
+    ),
+    const Center(
+      child: Text('2'),
+    ),
+    const Center(
+      child: Text('3'),
+    ),
+    const Center(
+      child: Text('4'),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final PageController _pageController = PageController();
+    PageController pageController = PageController(initialPage: widget.index);
+
     return Row(
       children: [
         IconButton(
             onPressed: () {
-              _pageController.previousPage(
-                  duration: const Duration(milliseconds: 400),
+              setState(() {
+                widget.index = widget.index <= 0 ?
+                0 : widget.index - 1;
+              });
+              pageController.animateToPage(
+                  widget.index,
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.linear);
-            },
+              },
             icon: const Icon(Icons.arrow_left)
-
-
         ),
         Expanded(
             child: PageView(
-                controller: _pageController,
-                children: const <Widget> [
-                  Center(
-                    child: Text('1'),
-                  ),
-                  Center(
-                    child: Text('2'),
-                  ),
-                  Center(
-                    child: Text('3'),
-                  ),
-                  Center(
-                    child: Text('4'),
-                  ),
-                ]
+                controller: pageController,
+                children: _pages
             )
         ),
         IconButton(
             onPressed: () {
-              _pageController.nextPage(
-                  duration: const Duration(milliseconds: 400),
+              setState(() {
+                widget.index = widget.index >= _pages.length - 1 ?
+                _pages.length : widget.index + 1;
+              });
+              pageController.animateToPage(
+                  widget.index,
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.linear);
-            },
+              },
             icon: const Icon(Icons.arrow_right)
-
-
         ),
       ],
     );
