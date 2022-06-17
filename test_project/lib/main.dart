@@ -117,16 +117,23 @@ class _PageTwoState extends State<PageTwo> {
             icon: const Icon(Icons.arrow_left)
         ),
         Expanded(
-            child: PageView(
-                controller: pageController,
-                children: _pages
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView(
+                    controller: pageController,
+                    children: _pages
+                  )
+                ),
+                Text((widget.index + 1).toString())
+              ],
             )
         ),
         IconButton(
             onPressed: () {
               setState(() {
                 widget.index = widget.index >= _pages.length - 1 ?
-                _pages.length : widget.index + 1;
+                widget.index : widget.index + 1;
               });
               pageController.animateToPage(
                   widget.index,
