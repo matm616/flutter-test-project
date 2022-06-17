@@ -1,4 +1,3 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,105 +9,124 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      theme: ThemeData.dark(),
-      home: const RandomWords(),
-    );
-  }
-}
-
-class RandomWords extends StatefulWidget {
-  const RandomWords({Key? key}) : super(key: key);
-
-  @override
-  State<RandomWords> createState() => _RandomWordsState();
-}
-
-class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved = <WordPair>{};
-  final _biggerFont = const TextStyle(fontSize: 18);
-
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) {
-          final tiles = _saved.map(
-            (pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-
-          final divided = tiles.isNotEmpty
-              ? ListTile.divideTiles(
-                  context: context,
-                  tiles: tiles,
-                ).toList()
-              : <Widget>[];
-
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Saved Suggestions'),
-            ),
-            body: ListView(children: divided),
-          );
-        },
+    return const MaterialApp(
+      // routes: {
+      //   // '/pageOne': (context) => const PageOne(),
+      // },
+      home: DefaultTabController(
+        length: 2,
+        child: Screen(),
       ),
     );
   }
+}
+
+class Screen extends StatelessWidget {
+  const Screen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Startup Name Generator'),
-          actions: [
-            IconButton(
-              onPressed: _pushSaved,
-              icon: const Icon(Icons.list),
-              tooltip: 'Saved Suggestion',
+      appBar: AppBar(
+        title: const Text("App"),
+        bottom: const TabBar(
+          tabs: [
+            Tab(
+              text: "Page One",
             ),
-          ],
-        ),
-        body: ListView.builder(
-          padding: const EdgeInsets.all(16.0),
-          itemBuilder: (context, i) {
-            if (i.isOdd) return const Divider();
-
-            final index = i ~/ 2;
-            if (index >= _suggestions.length) {
-              _suggestions.addAll(generateWordPairs().take(10));
-            }
-
-            final alreadySaved = _saved.contains(_suggestions[index]);
-            return ListTile(
-              title: Text(
-                _suggestions[index].asPascalCase,
-                style: _biggerFont,
-              ),
-              trailing: Icon(
-                alreadySaved ? Icons.favorite : Icons.favorite_border,
-                color: alreadySaved ? Colors.red : null,
-                semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
-              ),
-              onTap: () {
-                setState(() {
-                  if (alreadySaved) {
-                    _saved.remove(_suggestions[index]);
-                  } else {
-                    _saved.add(_suggestions[index]);
-                  }
-                });
-              },
-            );
-            },
+            Tab(
+              text: "Page Two",
+            ),
+          ]
         )
+      ),
+      body: const TabBarView(
+        children: [
+          PageOne(),
+          PageTwo(),
+        ]
+      )
     );
   }
 }
+
+
+class PageOne extends StatelessWidget {
+  const PageOne({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+        children: const [
+          Text("1"),
+          Text("2"),
+          Text("3"),
+          Text("4"),
+          Text("5"),
+          Text("6"),
+          Text("7"),
+          Text("8"),
+          Text("9"),
+          Text("10"),
+        ]
+    );
+  }
+}
+
+class PageTwo extends StatefulWidget {
+  const PageTwo({Key? key}) : super(key: key);
+
+  @override
+  State<PageTwo> createState() => _PageTwoState();
+}
+
+class _PageTwoState extends State<PageTwo> {
+  @override
+  Widget build(BuildContext context) {
+    final PageController _pageController = PageController();
+    return Row(
+      children: [
+        IconButton(
+            onPressed: () {
+              _pageController.previousPage(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.linear);
+            },
+            icon: const Icon(Icons.arrow_left)
+
+
+        ),
+        Expanded(
+            child: PageView(
+                controller: _pageController,
+                children: const <Widget> [
+                  Center(
+                    child: Text('1'),
+                  ),
+                  Center(
+                    child: Text('2'),
+                  ),
+                  Center(
+                    child: Text('3'),
+                  ),
+                  Center(
+                    child: Text('4'),
+                  ),
+                ]
+            )
+        ),
+        IconButton(
+            onPressed: () {
+              _pageController.nextPage(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.linear);
+            },
+            icon: const Icon(Icons.arrow_right)
+
+
+        ),
+      ],
+    );
+  }
+}
+
