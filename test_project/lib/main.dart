@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -82,6 +83,7 @@ class PageTwo extends StatefulWidget {
 }
 
 class _PageTwoState extends State<PageTwo> {
+  late PageController _pageController = PageController(initialPage: widget.index);
   final List<Widget> _pages = [
     const Center(
       child: Text('1'),
@@ -98,52 +100,59 @@ class _PageTwoState extends State<PageTwo> {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    PageController pageController = PageController(initialPage: widget.index);
+  void initState() {
+    _pageController.addListener(_listener);
+    super.initState();
+  }
 
-    return Row(
+  _listener() {
+    setState(() {
+      widget.index = _pageController.page != null ?
+      _pageController.page!.round() : 1;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    bool isWeb = kIsWeb;
+
+    Column page = Column(
+      children: [
+        Expanded(
+            child: PageView(
+                controller: _pageController,
+                children: _pages
+            )
+            ),
+        Text((widget.index + 1).toString())
+      ],
+    );
+
+    return isWeb ? Row(
       children: [
         IconButton(
             onPressed: () {
-              setState(() {
-                widget.index = widget.index <= 0 ?
-                0 : widget.index - 1;
-              });
-              pageController.animateToPage(
-                  widget.index,
+              _pageController.animateToPage(
+                  widget.index - 1,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.linear);
               },
             icon: const Icon(Icons.arrow_left)
         ),
         Expanded(
-            child: Column(
-              children: [
-                Expanded(
-                  child: PageView(
-                    controller: pageController,
-                    children: _pages
-                  )
-                ),
-                Text((widget.index + 1).toString())
-              ],
-            )
+          child: page
         ),
         IconButton(
             onPressed: () {
-              setState(() {
-                widget.index = widget.index >= _pages.length - 1 ?
-                widget.index : widget.index + 1;
-              });
-              pageController.animateToPage(
-                  widget.index,
+              _pageController.animateToPage(
+                  widget.index + 1,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.linear);
               },
             icon: const Icon(Icons.arrow_right)
         ),
       ],
-    );
+    ) : page;
   }
 }
 
